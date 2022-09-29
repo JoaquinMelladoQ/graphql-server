@@ -1,12 +1,12 @@
 import { gql, ApolloServer, UserInputError } from 'apollo-server';
-import './db.js'
-import Organization from './models/Organization.js'
+import './db.js';
+import Organization from './models/Organization.js';
 
 const typeDefs = gql`
 	enum YesNo {
 		YES
 		NO
-	}	
+	}
 	type Summary {
 		name: String!
 		level_cohesion: Int!
@@ -26,64 +26,67 @@ const typeDefs = gql`
 
 	type Mutation {
 		addOrganization(
-			name: String! 
-			phone: String 
-			city: String! 
-		): Organization
-		editNumber(
 			name: String!
-			phone: String!
+			phone: String
+			city: String!
 		): Organization
+		editNumber(name: String!, phone: String!): Organization
 	}
-`
+`;
 
 const resolvers = {
 	Query: {
 		organizationCount: () => Organization.collection.countDocuments(),
 		allOrganizations: async (_root, args) => {
-			if (!args.phone) return Organization.find({})
-			return Organization.find({ phone: {$exists: args.phone === "YES"} })
+			if (!args.phone) return Organization.find({});
+			return Organization.find({
+				phone: { $exists: args.phone === 'YES' },
+			});
 		},
 		findOrganization: (_root, args) => {
-			const { name } = args
-			return Organization.findOne({ name })
-		}
+			const { name } = args;
+			return Organization.findOne({ name });
+		},
 	},
 	Mutation: {
 		addOrganization: (_root, args) => {
- 			const organization = new Organization({ ...args })
+			const organization = new Organization({ ...args });
 			try {
-				organization.save()
+				organization.save();
 			} catch (e) {
 				throw new UserInputError(e.message, {
-					invalidArgs: args
-				})
+					invalidArgs: args,
+				});
 			}
 		},
 		editNumber: async (_root, args) => {
-			const organization = await Organization.findOne({ name: args.name })
-			if (!organization) return
-			organization.phone = args.phone
+			const organization = await Organization.findOne({
+				name: args.name,
+			});
+			if (!organization) return;
+			organization.phone = args.phone;
 
 			try {
-				organization.save()
+				organization.save();
 			} catch (e) {
 				throw new UserInputError(e.message, {
-					invalidArgs: args
-				})
+					invalidArgs: args,
+				});
 			}
-		}
+		},
 	},
 	Organization: {
-		summary: (root) => { 
+		summary: root => {
 			return {
 				name: root.name,
-				level_cohesion: root.level_cohesion
-			} 
-		}
-	}
-}
+				level_cohesion: root.level_cohesion,
+			};
+		},
+	},
+};
 
-const apolloServer = new ApolloServer({ typeDefs, resolvers })
+const apolloServer = new ApolloServer({ typeDefs, resolvers });
 
-apolloServer.listen().then(({ url }) => { console.log(`Server on port ${url}`)})
+apolloServer.listen().then(({ url }) => {
+	console.log(`Server on port ${url}`);
+});

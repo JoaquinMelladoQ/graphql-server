@@ -6,19 +6,19 @@ const schema = new mongoose.Schema({
 		type: String,
 		required: true,
 		unique: true,
-		minLength: 5
+		minLength: 5,
 	},
-	phone: { 
-		type: String, 
-		minLength: 5
+	phone: {
+		type: String,
+		minLength: 5,
 	},
 	city: {
 		type: String,
 		required: true,
-		minLength: 3
+		minLength: 3,
 	},
-})
+});
 
-schema.plugin(mongooseUniqueValidator)
+schema.plugin(mongooseUniqueValidator);
 
-export default mongoose.model("Organization", schema)
+export default mongoose.model('Organization', schema);
