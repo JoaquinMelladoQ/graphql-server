@@ -1,6 +1,8 @@
 import { gql, ApolloServer, UserInputError } from 'apollo-server';
-import './db.js';
+import './db/db.js';
 import Organization from './models/Organization.js';
+import User from './models/User.js';
+import Preference from './models/Preference.js';
 
 const typeDefs = gql`
 	enum YesNo {
@@ -18,10 +20,29 @@ const typeDefs = gql`
 		id: ID!
 		summary: Summary
 	}
+
+	type Preference {
+		name: String!
+		id: ID!
+	}
+
+	type User {
+		username: String!
+		phone: String
+		city: String!
+		suggestions: [Preference]!
+		id: ID!
+	}
+
+	type Token {
+		value: String!
+	}
+
 	type Query {
 		organizationCount: Int!
 		allOrganizations(phone: YesNo): [Organization]!
 		findOrganization(name: String!): Organization
+		me: User
 	}
 
 	type Mutation {
@@ -31,6 +52,8 @@ const typeDefs = gql`
 			city: String!
 		): Organization
 		editNumber(name: String!, phone: String!): Organization
+		createUser(username: String!): User
+		login(username: String!, password: String!): Token
 	}
 `;
 
